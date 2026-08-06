@@ -107,7 +107,3 @@ WHERE done = 1;
 
 The SQL queries directly modified the SQLite database, and the changes were immediately reflected when testing the API in Postman.
 
-## Author
-
-Dua Zahra
-FlyRank AI Backend Internship
