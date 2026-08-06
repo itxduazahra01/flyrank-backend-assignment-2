@@ -1,23 +1,28 @@
 const express = require("express");
 
+// Initialize SQLite database
+require("./config/sqlite");
+
 const app = express();
+
+app.use(express.json());
 
 const PORT = 3000;
 
+const taskRoutes = require("./routes/taskRoutes");
+
+app.use("/tasks", taskRoutes);
+
 app.get("/", (req, res) => {
   res.json({
-    message: "Hello from my first backend!",
+    message: "Task Management API",
   });
 });
 
-app.get("/about", (req, res) => {
-  res.json({
-    name: "Dua Zahra",
-    role: "Computer Science Student",
-    internship: "FlyRank AI Backend Intern",
-  });
-});
+console.log("Task Routes Loaded");
+
+console.log("Server starting...");
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
