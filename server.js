@@ -1,7 +1,8 @@
+require("dotenv").config();
+
 const express = require("express");
 
-// Initialize SQLite database
-require("./config/sqlite");
+const { initializeDatabase } = require("./config/postgres");
 
 const app = express();
 
@@ -20,9 +21,14 @@ app.get("/", (req, res) => {
 });
 
 console.log("Task Routes Loaded");
-
 console.log("Server starting...");
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("❌ Database initialization failed:", error);
+  });

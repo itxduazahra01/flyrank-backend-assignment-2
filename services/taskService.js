@@ -1,31 +1,31 @@
-const taskRepository = require("../repositories/sqliteTaskRepository");
+const taskRepository = require("../repositories/postgresTaskRepository");
 
-const getAllTasks = () => {
-  return taskRepository.getAllTasks();
+const getAllTasks = async () => {
+  return await taskRepository.getAllTasks();
 };
 
-const getTaskById = (id) => {
-  return taskRepository.getTaskById(id);
+const getTaskById = async (id) => {
+  return await taskRepository.getTaskById(id);
 };
 
-const createTask = (taskData) => {
+const createTask = async (taskData) => {
   if (!taskData.title) {
     throw new Error("Title is required");
   }
 
-  return taskRepository.createTask(taskData.title);
+  return await taskRepository.createTask(taskData.title);
 };
 
-const updateTask = (id, taskData) => {
+const updateTask = async (id, taskData) => {
   if (!taskData.title) {
     throw new Error("Title is required");
   }
 
-  return taskRepository.updateTask(id, taskData.title, taskData.done);
+  return await taskRepository.updateTask(id, taskData.title, taskData.done);
 };
 
-const deleteTask = (id) => {
-  return taskRepository.deleteTask(id);
+const deleteTask = async (id) => {
+  return await taskRepository.deleteTask(id);
 };
 
 module.exports = {
