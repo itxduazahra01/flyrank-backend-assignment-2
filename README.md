@@ -1,4 +1,4 @@
-# Week 3 - SQLite CRUD API
+# SQLite CRUD API
 
 ## Project Overview
 
