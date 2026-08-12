@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 
 const { initializeDatabase } = require("./config/postgres");
+const { connectRedis } = require("./config/redis");
 
 const app = express();
 
@@ -23,12 +24,17 @@ app.get("/", (req, res) => {
 console.log("Task Routes Loaded");
 console.log("Server starting...");
 
-initializeDatabase()
-  .then(() => {
+const startServer = async () => {
+  try {
+    await initializeDatabase();
+    await connectRedis();
+
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error("❌ Database initialization failed:", error);
-  });
+  } catch (error) {
+    console.error("❌ Application startup failed:", error);
+  }
+};
+
+startServer();

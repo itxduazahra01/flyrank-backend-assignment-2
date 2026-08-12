@@ -1,12 +1,46 @@
 const { pool } = require("../config/postgres");
+const { redisClient } = require("../config/redis");
+
+const ALL_TASKS_KEY = "tasks:all";
+
+const taskKey = (id) => `tasks:${id}`;
 
 const getAllTasks = async () => {
+  const cachedTasks = await redisClient.get(ALL_TASKS_KEY);
+
+  if (cachedTasks) {
+    console.log("🟢 Cache HIT: tasks:all");
+    return JSON.parse(cachedTasks);
+  }
+
+  console.log("🔵 Cache MISS: tasks:all");
+
   const result = await pool.query("SELECT * FROM tasks");
+
+  await redisClient.set(ALL_TASKS_KEY, JSON.stringify(result.rows));
+
   return result.rows;
 };
 
 const getTaskById = async (id) => {
+  const key = taskKey(id);
+
+  const cachedTask = await redisClient.get(key);
+
+  if (cachedTask) {
+    console.log(`🟢 Cache HIT: ${key}`);
+    return JSON.parse(cachedTask);
+  }
+
+  console.log(`🔵 Cache MISS: ${key}`);
+
   const result = await pool.query("SELECT * FROM tasks WHERE id = $1", [id]);
+
+  if (!result.rows[0]) {
+    return null;
+  }
+
+  await redisClient.set(key, JSON.stringify(result.rows[0]));
 
   return result.rows[0];
 };
@@ -16,6 +50,8 @@ const createTask = async (title) => {
     "INSERT INTO tasks (title, done) VALUES ($1, $2) RETURNING *",
     [title, false],
   );
+
+  await redisClient.del(ALL_TASKS_KEY);
 
   return result.rows[0];
 };
@@ -31,13 +67,27 @@ const updateTask = async (id, title, done) => {
     [title, done, id],
   );
 
-  return result.rows[0] || null;
+  if (!result.rows[0]) {
+    return null;
+  }
+
+  await redisClient.del(ALL_TASKS_KEY);
+  await redisClient.del(taskKey(id));
+
+  return result.rows[0];
 };
 
 const deleteTask = async (id) => {
   const result = await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
 
-  return result.rowCount > 0;
+  if (result.rowCount === 0) {
+    return false;
+  }
+
+  await redisClient.del(ALL_TASKS_KEY);
+  await redisClient.del(taskKey(id));
+
+  return true;
 };
 
 module.exports = {
