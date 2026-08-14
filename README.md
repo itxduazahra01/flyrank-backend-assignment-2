@@ -1,109 +1,59 @@
-# SQLite CRUD API
+# Task Management API
 
-## Project Overview
-
-This project is a Task Management REST API built with Node.js, Express.js, and SQLite. It demonstrates complete CRUD (Create, Read, Update, Delete) operations using a SQLite database instead of in-memory storage.
+A REST API for managing tasks built with Node.js and Express.js. The project uses PostgreSQL for persistent storage, Redis for caching, and Docker Compose to run the API, PostgreSQL, and Redis together.
 
 ## Technologies Used
 
 - Node.js
 - Express.js
-- SQLite
-- better-sqlite3
-
-## Project Structure
-
-```
-Week 1/
-│
-├── config/
-│   └── sqlite.js
-│
-├── repositories/
-│   └── sqliteTaskRepository.js
-│
-├── services/
-│   └── taskService.js
-│
-├── routes/
-│   └── taskRoutes.js
-│
-├── tasks.db
-├── server.js
-├── package.json
-└── README.md
-```
+- PostgreSQL
+- Redis
+- Docker
+- Docker Compose
 
 ## Features
 
-- View all tasks
-- View a task by ID
-- Create a new task
-- Update an existing task
+- Get all tasks
+- Get a task by ID
+- Create a task
+- Update a task
 - Delete a task
-- Automatic database creation
-- Automatic table creation
-- Automatic seed data insertion
+- PostgreSQL persistent storage
+- Redis caching for GET requests
+- Redis cache invalidation after create, update, and delete
+- Docker Compose setup
+- PostgreSQL and Redis healthchecks
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /tasks | Get all tasks |
-| GET | /tasks/:id | Get task by ID |
-| POST | /tasks | Create a task |
-| PUT | /tasks/:id | Update a task |
-| DELETE | /tasks/:id | Delete a task |
+| Method | Endpoint     | Description      |
+| ------ | ------------ | ---------------- |
+| GET    | `/tasks`     | Get all tasks    |
+| GET    | `/tasks/:id` | Get a task by ID |
+| POST   | `/tasks`     | Create a task    |
+| PUT    | `/tasks/:id` | Update a task    |
+| DELETE | `/tasks/:id` | Delete a task    |
 
-## How to Run
+## Project Structure
 
-1. Install dependencies
-
-```bash
-npm install
+```text
+Week 3/
+├── config/
+│   ├── postgres.js
+│   └── redis.js
+├── repositories/
+│   └── postgresTaskRepository.js
+├── routes/
+│   └── taskRoutes.js
+├── services/
+│   └── taskService.js
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── compose.yaml
+├── package.json
+├── package-lock.json
+├── server.js
+└── README.md
 ```
-
-2. Start the server
-
-```bash
-node server.js
-```
-
-3. Open Postman
-
-```
-http://localhost:3000/tasks
-```
-
-## SQLite Database
-
-The SQLite database file is:
-
-```
-tasks.db
-```
-
-It is automatically created when the project starts.
-
-If the database is empty, three sample tasks are inserted automatically.
-
-## SQL Queries Practiced
-
-```sql
-SELECT * FROM tasks;
-
-SELECT * FROM tasks WHERE done = 1;
-
-SELECT COUNT(*) FROM tasks;
-
-UPDATE tasks
-SET done = 1;
-
-DELETE FROM tasks
-WHERE done = 1;
-```
-
-### Observation
-
-The SQL queries directly modified the SQLite database, and the changes were immediately reflected when testing the API in Postman.
-

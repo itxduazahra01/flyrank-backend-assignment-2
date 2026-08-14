@@ -17,7 +17,8 @@ const getAllTasks = async () => {
 
   const result = await pool.query("SELECT * FROM tasks");
 
-  await redisClient.set(ALL_TASKS_KEY, JSON.stringify(result.rows));
+  // Cache expires after 60 seconds
+  await redisClient.set(ALL_TASKS_KEY, JSON.stringify(result.rows), { EX: 60 });
 
   return result.rows;
 };
@@ -40,7 +41,8 @@ const getTaskById = async (id) => {
     return null;
   }
 
-  await redisClient.set(key, JSON.stringify(result.rows[0]));
+  // Cache expires after 60 seconds
+  await redisClient.set(key, JSON.stringify(result.rows[0]), { EX: 60 });
 
   return result.rows[0];
 };
@@ -58,12 +60,10 @@ const createTask = async (title) => {
 
 const updateTask = async (id, title, done) => {
   const result = await pool.query(
-    `
-    UPDATE tasks
-    SET title = $1, done = $2
-    WHERE id = $3
-    RETURNING *
-    `,
+    `UPDATE tasks
+     SET title = $1, done = $2
+     WHERE id = $3
+     RETURNING *`,
     [title, done, id],
   );
 
